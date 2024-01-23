@@ -1,0 +1,89 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<form class="layui-form p-4">
+    <h3 class="pb-3">新建设备</h3>
+    <table class="layui-table layui-table-form">
+        <tr>
+            <td class="layui-td-gray">设备名<font>*</font></td>
+            <td><input type="text" name="equipment_name" lay-verify="required" lay-reqText="请输入设备名" autocomplete="off"
+                       placeholder="请输入设备名" class="layui-input"></td>
+            <td class="layui-td-gray">设备分类<font>*</font></td>
+            <td>
+                <select name="type_id" lay-verify="required" lay-reqText="请选择分类">
+                    <option value="">请选择设备分类</option>
+                    {volist name="med_type" id="v"}
+                    <option value="{$v.type_id}">{$v.type_name}</option>
+                    {/volist}
+                </select>
+            </td>
+
+        </tr>
+        <tr>
+            <td class="layui-td-gray">状态<font>*</font></td>
+            <td>
+                <input type="radio" name="status" value="1" title="正常" checked>
+                <input type="radio" name="status" value="0" title="异常">
+            </td>
+            <td class="layui-td-gray">价格</td>
+            <td>
+                <input type="text" name="price"  placeholder="请输价格" class="layui-input">
+            </td>
+        </tr>
+        <tr>
+            <td class="layui-td-gray">数量<font>*</font></td>
+            <td>
+                <input type="text" name="number" value="0" min="0" lay-verify="required|number" placeholder="请输入数量" lay-affix="number" step="1"  class="layui-input">
+                <input type="hidden" name="enable_number" value="0"   class="layui-input">
+            </td>
+        </tr>
+
+
+    </table>
+    <div class="pt-3">
+        <button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="webform">立即提交</button>
+        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+    </div>
+</form>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+    moduleInit = ['tool', 'tinymce'];
+    function gouguInit() {
+        var form = layui.form, tool = layui.tool;
+
+        //监听提交
+        form.on('submit(webform)', function (data) {
+
+            let callback = function (e) {
+                layer.msg(e.msg);
+                if (e.code == 0) {
+                    tool.tabRefresh(71);
+                    tool.sideClose(1000);
+                }
+            }
+            console.log(data);
+            tool.post("/zzk/equipment/save", data.field, callback);
+            return false;
+        });
+        //监听提交
+       /* form.on('submit(webform)', function (data) {
+            let callback = function (e) {
+                layer.msg(e.msg);
+                if (e.code == 0) {
+                    setTimeout(function () {
+                        parent.location.reload();
+                    }, 1000);
+                }
+            }
+            tool.post("/teach/book/save", data.field, callback);
+            return false;
+        });*/
+
+    }
+</script>
+{/block}
+<!-- /脚本 -->

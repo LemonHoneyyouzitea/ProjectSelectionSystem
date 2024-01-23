@@ -1,0 +1,78 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<style>
+    h1 {
+        text-align: center;
+        margin-top: 50px;
+        margin-bottom: 10px;
+    }
+</style>
+<form class="layui-form p-4">
+    <input type="hidden" id="belong_id" name="belong_id" value="{$belong_id}" />
+
+    <h1 class="layui-font-green">维修工列表</h1>
+    <div class="p-3">
+        <table class="layui-hide" type="hidden" id="worker" lay-filter="worker" ></table>
+    </div>
+</form>
+{/block}
+<!-- /主体 -->
+<!-- 脚本 -->
+{block name="script"}
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="order">预约</a>
+</script>
+<script>
+    moduleInit = ['tool', 'tinymce'];
+    function gouguInit() {
+        var table = layui.table, tool = layui.tool, form = layui.form;
+        layui.pageTable = table.render({
+            elem: '#worker',
+            title: '当前设备归属的部门列表',
+            toolbar: '#toolbar',
+            page: false,
+            url: '/zzk/equipment/worker?belong_id='+$("#belong_id").val(),
+            cols: [[
+                {type: 'numbers', title: '序号', align: 'center', width: 80},
+                {field: 'belong_id' , title: '设备归属ID', align: 'center',hide:'ture'},  // 新增一列用于显示belong_id的值
+                {field: 'nickname', title: '修理工名', align: 'center'},
+                {field: 'mobile', title: '电话', align: 'center'},
+                {fixed: 'right', field: 'right', title: '操作', toolbar: '#barDemo', align: 'center'}
+            ]]
+        });
+        //监听提交
+        form.on('submit(webform)', function (data) {
+            let callback = function (e) {
+                layer.msg(e.msg);
+                if (e.code == 0) {
+                    setTimeout(function () {
+                        parent.location.reload();
+                    }, 1000);
+                }
+            }
+            tool.post("/zzk/equipment/save_add", data.field, callback);
+            return false;
+        });
+        //监听表格行工具事件
+        table.on('tool(worker)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'order') {  //加入购物车
+                let callback = function (e) {
+                    layer.msg(e.msg);
+                    if (e.code == 0) {
+                        setTimeout(function () {
+                            parent.location.reload();
+                        }, 1000);
+                    }
+                }
+                console.log(data)
+                tool.post('/zzk/equipment/order' ,data , callback);
+                return false;
+            }
+            return false;
+        });
+    }
+</script>
+{/block}
+<!-- /脚本 -->

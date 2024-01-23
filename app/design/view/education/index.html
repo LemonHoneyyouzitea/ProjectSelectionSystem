@@ -1,0 +1,90 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<div class="p-3">
+    <form class="layui-form gg-form-bar border-t border-x">
+        <div class="layui-input-inline" style="width:200px;">
+            <input type="text" name="keywords" placeholder="名称" class="layui-input"/>
+        </div>
+        <div class="layui-input-inline">
+            <button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="webform">提交搜索</button>
+        </div>
+    </form>
+    <table class="layui-hide" id="type" lay-filter="type"></table>
+</div>
+
+<script type="text/html" id="toolbar">
+    <button class="layui-btn layui-btn-sm" lay-event="add" id="add">+ 添加学历</button>
+</script>
+<script type="text/html" id="bar">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+    const moduleInit = ['tool'];
+
+    function gouguInit() {
+        var table = layui.table, tool = layui.tool, form = layui.form;
+        layui.pageTable = table.render({
+            elem: '#type',   //对应13行的id的值
+            title: '学历列表',
+            toolbar: '#toolbar',
+            page: false,
+            url: '/design/education/data', //数据接口
+            cols: [[
+                {type: 'numbers', title: '序号', align: 'center', width: 80},
+                {field: 'education_name', title: '类别名称'},
+                {field: 'create_time', title: '创建时间', align: 'center'},
+                {title: '操作', toolbar: '#bar', width: 100, align: 'center'}
+            ]]
+        });
+
+        $("#add").click(function () {
+            tool.side("/design/education/add");
+            return false;
+        });
+
+        table.on('tool(type)', function (obj) {  //对应13行的lay-filter的值
+            var data = obj.data;
+            if (obj.event === 'edit') {
+                tool.side('/design/education/edit?id=' + obj.data.education_id);  //向后台传递编辑的id，其中data.id中的id为book_type的主键字段名称
+                return;
+            }
+            if (obj.event === 'del') {
+                layer.confirm('确定要删除该数据吗？', {
+                    icon: 3,
+                    title: '提示'
+                }, function (index) {
+                    let callback = function (e) {
+                        layer.msg(e.msg);
+                        if (e.code == 0) {
+                            obj.del();
+                        }
+                    }
+                    tool.delete("/design/education/delete", {education_id: data.education_id}, callback);
+                    layer.close(index);
+                });
+            }
+        });
+
+        //监听搜索提交
+        form.on('submit(webform)', function (data) {
+            layui.pageTable.reload({
+                where: {
+                    keywords: data.field.keywords
+                },
+                page: {
+                    curr: 1
+                }
+            });
+            return false;
+        });
+    }
+</script>
+{/block}
+<!-- /脚本 -->

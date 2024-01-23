@@ -1,0 +1,70 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<form class="layui-form p-4">
+    <h3 class="pb-3">添加题目</h3>
+    <table class="layui-table layui-table-form">
+        <tr>
+            <td class="layui-td-gray">题目名<font>*</font></td>
+            <td><input type="text" name="project_name" lay-verify="required" lay-reqText="请输入题目名" autocomplete="off"
+                       placeholder="请输入题目名" class="layui-input"></td>
+            <td class="layui-td-gray">题目分类<font>*</font></td>
+            <td>
+                <select name="type_id" lay-verify="required" lay-reqText="请选择分类">
+                    <option value="">请选择题目分类</option>
+                    {volist name="sp_type" id="v"}
+                    <option value="{$v.type_id}">{$v.type_name}</option>
+                    {/volist}
+                </select>
+            </td>
+        </tr>
+        <input type="hidden" name="teacher_id" class="layui-input">
+
+    </table>
+    <div class="pt-3">
+        <button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="webform">立即提交</button>
+        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+    </div>
+</form>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+    moduleInit = ['tool', 'tinymce'];
+    function gouguInit() {
+        var form = layui.form, tool = layui.tool;
+
+        //监听提交
+        form.on('submit(webform)', function (data) {
+
+            let callback = function (e) {
+                layer.msg(e.msg);
+                if (e.code == 0) {
+                    tool.tabRefresh(71);
+                    tool.sideClose(1000);
+                }
+            }
+            console.log(data);
+            tool.post("/design/projects/save", data.field, callback);
+            return false;
+        });
+        //监听提交
+       /* form.on('submit(webform)', function (data) {
+            let callback = function (e) {
+                layer.msg(e.msg);
+                if (e.code == 0) {
+                    setTimeout(function () {
+                        parent.location.reload();
+                    }, 1000);
+                }
+            }
+            tool.post("/teach/book/save", data.field, callback);
+            return false;
+        });*/
+
+    }
+</script>
+{/block}
+<!-- /脚本 -->

@@ -1,0 +1,131 @@
+
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<style>
+  h1 {
+    text-align: center;
+    margin-top: 50px;
+    margin-bottom: 10px;
+  }
+</style>
+<form class="layui-form p-4">
+  <input type="hidden" id="project_id" name="project_id" value="{$project_id}" />
+  <h1 class="layui-font-green">选择该题目的学生列表</h1>
+  <div class="p-3">
+    <table class="layui-hide" type="hidden" id="stu" lay-filter="stu" ></table>
+  </div>
+  </div>
+</form>
+<script type="text/html" id="bar">
+  <a class="layui-btn layui-btn-xs" lay-event="take">使用</a>
+</script>
+<script type="text/html" id="barDemo">
+
+  {{#  if(d.select_status ==1){ }}
+  <a class="layui-btn layui-btn-xs " lay-event="access">通过</a>
+  <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="refuse">拒绝</a>
+  {{#  }else if(d.select_status == 2){  }}
+  <span style="color: #16b777 ;">已同意</span>
+  {{#  }else if(d.select_status == -1){  }}
+  <span style="color: #ff5722 ;">已拒绝</span>
+  {{#  } }}
+
+</script>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+  var moduleInit = ['tool'];
+
+  function gouguInit() {
+
+    var table = layui.table, tool = layui.tool, form = layui.form;
+    layui.pageTable = table.render({
+      elem: '#stu',   //对应13行的id的值
+      title: '选择当前题目的设学生列表',
+      toolbar: '#toolbarDemo',
+      url: '/design/resubmit/read?project_id='+$("#project_id").val(), //数据接口
+      page: false,
+      cols: [[
+        {type: 'numbers', title: '序号', align: 'center', width: 80},
+        {field: 'select_id', title: 'select_id', align: 'center',hide:'true'},
+        {field: 'select_status', title: 'select_status', align: 'center',hide:'true'},
+        {field: 'nickname', title: '学生名', align: 'center'},
+        {field: 'education_name', title: '学历', align: 'center'},
+        {field: 'create_time', title: '申请时间', align: 'center'},
+        {fixed: 'right', field: 'right', title: '操作', toolbar: '#barDemo', align: 'center'},
+        /*{field: 'num', title: '数量'},*/
+      ]]
+    });
+    //监听提交
+    form.on('submit(webform)', function (data) {
+      return false;
+    });
+    /*table.on('tool(enable)', function (obj) {
+      var data = obj.data;
+      if (obj.event === 'take') {  //加入购物车
+        let callback = function (e) {
+          layer.msg(e.msg);
+          if (e.code == 0) {
+            setTimeout(function () {
+              parent.location.reload();
+            }, 1000);
+          }
+        }
+        //console.log(data)
+        tool.post('/zzk/department/take' ,data , callback);
+        return false;
+      }
+      return false;*/
+    //监听表格行工具事件
+    table.on('tool(stu)', function (obj) {
+      var data = obj.data;
+      if (obj.event === 'add') {
+        tool.side('/design/projects/add_num?id=' + data.equipment_id);
+      } else if (obj.event === 'seepage') {
+        tool.side('/design/audit/show?id=' + data.project_id);
+      } else if (obj.event === 'access') {
+        layer.confirm('确定要同意该同学,同时拒绝其他同学吗？', {
+          icon: 3,
+          title: '提示'
+        }, function (index) {
+          let callback = function (e) {
+            layer.msg(e.msg);
+            if (e.code == 0) {
+              setTimeout(function () {
+                location.reload();
+              }, 1000);
+            }
+          }
+          tool.post("/design/resubmit/access", {project_id: data.project_id,select_id:data.select_id}, callback);
+          layer.close(index);
+          return false;
+        });
+      }else if (obj.event === 'refuse') {
+        layer.confirm('确定要拒绝该同学吗？', {
+          icon: 3,
+          title: '提示'
+        }, function (index) {
+          let callback = function (e) {
+            layer.msg(e.msg);
+            if (e.code == 0) {
+              setTimeout(function () {
+                location.reload();
+              }, 1000);
+            }
+          }
+          tool.post("/design/resubmit/refuse", {project_id: data.project_id,select_id:data.select_id}, callback);
+          layer.close(index);
+          return false;
+        });
+      }
+      return false;
+    });
+  }
+</script>
+{/block}
+<!-- /脚本 -->
+

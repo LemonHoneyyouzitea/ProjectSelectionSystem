@@ -1,0 +1,177 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+
+<div class="p-3">
+    <form class="layui-form gg-form-bar border-t border-x">
+        <div class="layui-input-inline">
+            <select name="type_id">
+                <option value="">请选择图书分类</option>
+                {volist name="book_type" id="v"}
+                <option value="{$v.id}">{$v.type_name}</option>
+                {/volist}
+            </select>
+        </div>
+        <div class="layui-input-inline" style="width:300px;">
+            <input type="text" name="keywords" placeholder="请输入关键字" class="layui-input" autocomplete="off"/>
+        </div>
+        <div class="layui-input-inline">
+            <button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="searchform">提交搜索</button>
+        </div>
+    </form>
+    <table class="layui-hide" id="book" lay-filter="book"></table>
+</div>
+
+
+<script type="text/html" id="toolbarDemo">
+    <button type="button" class="layui-btn layui-btn-sm layui-btn-normal" lay-event="add">
+        <i class="layui-icon layui-icon-addition"></i> 添加图书
+    </button>
+    <button type="button" class="layui-btn layui-btn-sm layui-btn-danger" lay-event="del">
+        <i class="layui-icon layui-icon-delete"></i> 删除图书
+    </button>
+</script>
+
+<script type="text/html" id="barDemo">
+
+    {{#  if(d.status ==0){ }}
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+    {{#  }else{  }}
+    <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="add">加入购物车</a>
+    {{#  } }}
+
+</script>
+<script type="text/html" id="up_down">
+    <input type="checkbox" name="{{d.id}}" lay-skin="switch" value="{{d.status}}" title="上架|下架" lay-filter="up_down" {{
+           d.status== 1 ? 'checked' : '' }}>
+</script>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+    const moduleInit = ['tool'];
+
+    function gouguInit() {
+        var table = layui.table, tool = layui.tool, form = layui.form;
+        layui.pageTable = table.render({
+            elem: '#book',
+            title: '列表',
+            toolbar: '#toolbarDemo',
+            url: '/teach/book/index',
+            page: true,
+            even: true,  //奇偶行变色
+            limits: [1, 10, 20, 50, 100],
+            limit: 10,
+            cols: [[
+                {type: 'checkbox'},
+                {type: 'numbers', title: '编号', align: 'center'},
+                {field: 'type_name', title: '图书类别', align: 'center',},
+                {field: 'book_name', title: '书名', align: 'center',},
+                {field: 'publisher', title: '出版社', align: 'center',},
+                {field: 'price', title: '价格', align: 'center',},
+                {field: 'number', title: '数量', align: 'center'},
+                {field: 'status', title: '状态', toolbar: '#up_down', align: 'center',},
+                {fixed: 'right', field: 'right', title: '操作', toolbar: '#barDemo', align: 'center'}
+            ]]
+        });
+
+        //监听表头工具栏事件
+        table.on('toolbar(book)', function (obj) {
+            if (obj.event === 'add') {
+                tool.side("/teach/book/add");
+                return false;
+            } else if (obj.event === 'del') {
+                var checkStatus = table.checkStatus('book');
+                var data = checkStatus.data;
+                if (data.length > 0) {
+                    var book_id = [];
+                    for (var i in data)
+                        book_id[i] = data[i].id;
+                    layer.confirm('确定要删除所选记录吗?', {
+                        icon: 3,
+                        title: '提示'
+                    }, function (index) {
+                        let callback = function (e) {
+                            layer.msg(e.msg);
+                            if (e.code == 0) {
+                                table.reload('book', {});
+                            }
+                        }
+                        console.log(book_id);
+                        tool.delete("/teach/book/del", {id: book_id}, callback);
+                        layer.close(index);
+                    });
+                } else {
+                    layer.msg("请选择需要删除的数据！");
+                }
+            }
+        });
+
+        //监听表格行工具事件
+        table.on('tool(book)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'add') {  //加入购物车
+                let callback = function (e) {
+                    layer.msg(e.msg);
+                    if (e.code == 0) {
+                        setTimeout(function () {
+                            location.reload();
+                        }, 1000);
+                    }
+                }
+                tool.post("/teach/book/add_cart", {id: data.id}, callback);
+                return false;
+            } else if (obj.event === 'edit') {
+                tool.side('/teach/book/edit?id=' + data.id);
+            } else if (obj.event === 'del') {
+                layer.confirm('确定要删除该记录吗?', {
+                    icon: 3,
+                    title: '提示'
+                }, function (index) {
+                    let callback = function (e) {
+                        layer.msg(e.msg);
+                        if (e.code == 0) {
+                            obj.del();
+                        }
+                    }
+                    tool.delete("/teach/book/del", {id: data.id}, callback);
+                    layer.close(index);
+                });
+            }
+            return false;
+        });
+
+        form.on('switch(up_down)', function (obj) {   //up_down为46行的lay_filter的值
+            let callback = function (e) {
+                layer.msg(e.msg);
+                if (e.code == 0) {
+                    setTimeout(function () {
+                        location.reload();
+                    }, 1000);
+                }
+            }
+            var data = {id: this.name, status: this.value}
+            tool.post("/teach/book/up_down", data, callback);
+            return false;
+        });
+
+        //监听搜索提交
+        form.on('submit(searchform)', function (data) {
+            layui.pageTable.reload({
+                where: {
+                    keywords: data.field.keywords,
+                    type_id: data.field.type_id
+                },
+                page: {
+                    curr: 1
+                }
+            });
+            return false;
+        });
+    }
+</script>
+{/block}
+<!-- /脚本 -->

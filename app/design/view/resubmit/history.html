@@ -1,0 +1,136 @@
+
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<style>
+  h1 {
+    text-align: center;
+    margin-top: 50px;
+    margin-bottom: 10px;
+  }
+</style>
+<form class="layui-form p-4">
+  <input type="hidden" id="project_id" name="project_id" value="{$project_id}" />
+  <h1 class="layui-font-green">该题目的申请记录表</h1>
+  <div class="p-3">
+    <table class="layui-hide" type="hidden" id="projects" lay-filter="projects" ></table>
+  </div>
+</form>
+
+
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+  var moduleInit = ['tool'];
+
+  function gouguInit() {
+
+    var table = layui.table, tool = layui.tool, form = layui.form;
+    layui.pageTable = table.render({
+      elem: '#projects',   //对应13行的id的值
+      title: '选择当前题目的设学生列表',
+      toolbar: '#toolbarDemo',
+      url: '/design/resubmit/history?project_id='+$("#project_id").val(), //数据接口
+      page: false,
+      cols: [[
+        {type: 'numbers', title: '序号', align: 'center', width: 80},
+        {field: 'audit_id', title: 'audit_id', align: 'center',hide:'true'},
+        {field: 'nickname', title: '审核管理员', align: 'center'},
+        {field: 'create_time', title: '审核时间', align: 'center'},
+        {field: 'reasons', title: '拒绝原因', align: 'center'},
+        {
+          field: 'status', title: '审核结果', align: 'center', width: 100, templet: function (d) {
+            if (d.status == 1) return '<span>已通过</span>';
+            else if(d.status == -1)return '<span style="color:#FF5722">已被拒绝</span>';
+          }
+        },
+      ]]
+    });
+    //监听提交
+    form.on('submit(webform)', function (data) {
+      return false;
+    });
+    /*table.on('tool(enable)', function (obj) {
+      var data = obj.data;
+      if (obj.event === 'take') {  //加入购物车
+        let callback = function (e) {
+          layer.msg(e.msg);
+          if (e.code == 0) {
+            setTimeout(function () {
+              parent.location.reload();
+            }, 1000);
+          }
+        }
+        //console.log(data)
+        tool.post('/zzk/department/take' ,data , callback);
+        return false;
+      }
+      return false;*/
+    //监听表格行工具事件
+    table.on('tool(projects)', function (obj) {
+      var data = obj.data;
+      if (obj.event === 'add') {
+        tool.side('/design/projects/add_num?id=' + data.equipment_id);
+      } else if (obj.event === 'seepage') {
+        tool.side('/design/audit/show?id=' + data.project_id);
+      } else if (obj.event === 'refuse') {
+        let content = '<div style="padding: 16px;"><textarea name="reason" class="layui-textarea" placeholder="请输入拒绝理由" style="height: 100px;"></textarea></div>';
+        layer.open({
+          title: '拒绝理由',
+          content: content,
+          btn: ['确定', '取消'],
+          yes: function (index, layero) {
+            let reason = layero.find('textarea[name="reason"]').val();
+            let data1 = { project_id: data.project_id, reason: reason }; // 这里修改为 obj.project_id
+            tool.post("/design/audit/refuse", data1, function (e) {
+              layer.msg(e.msg);
+              if (e.code == 0) {
+                setTimeout(function () {
+                  location.reload();
+                }, 1000);
+              }
+            });
+            layer.close(index);
+          },
+          btn2: function (index, layero) {
+            layer.close(index);
+          }
+        });
+      } else if (obj.event === 'access') {
+        layer.confirm('确定要同意该同学,同时拒绝其他同学吗？', {
+          icon: 3,
+          title: '提示'
+        }, function (index) {
+          let callback = function (e) {
+            layer.msg(e.msg);
+            if (e.code == 0) {
+              setTimeout(function () {
+                location.reload();
+              }, 1000);
+            }
+          }
+          tool.post("/design/resubmit/access", {project_id: data.project_id,select_id:data.select_id}, callback);
+          layer.close(index);
+          return false;
+        });
+        /*let callback = function (e) {
+          layer.msg(e.msg);
+          if (e.code == 0) {
+            setTimeout(function () {
+              location.reload();
+            }, 1000);
+          }
+        }
+        tool.post("/design/resubmit/access", {project_id: data.project_id,select_id:data.select_id}, callback);
+        return false;*/
+      }
+      return false;
+    });
+  }
+</script>
+{/block}
+<!-- /脚本 -->
+

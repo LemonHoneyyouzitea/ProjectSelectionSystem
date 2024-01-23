@@ -1,0 +1,161 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+
+<div class="p-3">
+    <form class="layui-form gg-form-bar border-t border-x">
+        <div class="layui-input-inline">
+            <select name="type_id">
+                <option value="">请选择选题类别</option>
+                {volist name="sp_type" id="v"}
+                <option value="{$v.type_id}">{$v.type_name}</option>
+                {/volist}
+            </select>
+        </div>
+        <div class="layui-input-inline" style="width:300px;">
+            <input type="text" name="keywords" placeholder="请输入关键字" class="layui-input" autocomplete="off"/>
+        </div>
+        <div class="layui-input-inline">
+            <button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="searchform">提交搜索</button>
+        </div>
+    </form>
+    <table class="layui-hide" id="projects" lay-filter="projects"></table>
+</div>
+
+
+<script type="text/html" id="toolbarDemo">
+    <button type="button" class="layui-btn layui-btn-sm layui-btn-normal" lay-event="add">
+        <i class="layui-icon layui-icon-addition"></i> 添加题目
+    </button>
+    <!--<button type="button" class="layui-btn layui-btn-sm layui-btn-green" lay-event="commit">
+        <i class="layui-icon layui-icon-addition"></i> 批量通过
+    </button>-->
+</script>
+
+<script type="text/html" id="barDemo">
+    {{#  if(d.status ==1){ }}
+    <a class="layui-btn layui-btn-xs layui-bg-blue" lay-event="read">查看</a>
+    <a class="layui-btn layui-btn-xs layui-bg-orange "lay-event="history">历史记录</a>
+    {{#  }else{  }}
+    <a class="layui-btn layui-btn-xs layui-bg-orange" lay-event="history">历史记录</a>
+    <a class="layui-btn layui-btn-xs " lay-event="edit">修改</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+    {{#  } }}
+</script>
+<script type="text/html" id="up_down">
+    {{#  if(d.status ==0){ }}
+    <span style="color: #ffb800 ;">未审核</span>
+    {{#  }else if(d.status == 1){  }}
+    <span style="color: #16b777 ;">已通过</span>
+    {{#  }else if(d.status == -1){  }}
+    <span style="color: #ff5722 ;">已拒绝</span>
+    {{#  } }}
+</script>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+    const moduleInit = ['tool'];
+
+    function gouguInit() {
+        var table = layui.table, tool = layui.tool, form = layui.form;
+        layui.pageTable = table.render({
+            elem: '#projects',
+            title: '列表',
+            toolbar: '#toolbarDemo',
+            defaultToolbar:[],
+            url: '/design/resubmit/index',
+            page: true,
+            even: true,  //奇偶行变色
+            limits: [1, 10, 20, 50, 100],
+            limit: 10,
+            cols: [[
+                {type: 'numbers', title: '编号', align: 'center'},
+                {field: 'project_name', title: '题目名称',event:'seepage', align: 'center',},
+                {field: 'project_id', title: '设备id', align: 'center',hide: 'true'},
+                {field: 'type_name', title: '题目类型', align: 'center',},
+                {field: 'status', title: '状态', toolbar: '#up_down', align: 'center'},
+                {fixed: 'right', field: 'right', title: '操作', toolbar: '#barDemo', align: 'center'}
+            ]],
+        });
+
+        //监听表头工具栏事件
+        table.on('toolbar(projects)', function (obj) {
+             if (obj.event === 'add') {
+                tool.side("/design/resubmit/add");
+                return false;
+            }
+        });
+
+        //监听表格行工具事件
+        table.on('tool(projects)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'edit') {
+                tool.side('/design/resubmit/edit?id=' + data.project_id);
+            } else if (obj.event === 'seepage') {
+                tool.side('/design/audit/show?id=' + data.project_id);
+            } else if (obj.event === 'history') {
+                tool.side('/design/resubmit/history?project_id=' + data.project_id);
+            } else if (obj.event === 'read') {
+                    tool.side('/design/resubmit/read?project_id=' + data.project_id);
+            } else if (obj.event === 'refuse') {
+                let content = '<div style="padding: 16px;"><textarea name="reason" class="layui-textarea" placeholder="请输入拒绝理由" style="height: 100px;"></textarea></div>';
+                layer.open({
+                    title: '拒绝理由',
+                    content: content,
+                    btn: ['确定', '取消'],
+                    yes: function (index, layero) {
+                        let reason = layero.find('textarea[name="reason"]').val();
+                        let data1 = { project_id: data.project_id, reason: reason }; // 这里修改为 obj.project_id
+                        tool.post("/design/audit/refuse", data1, function (e) {
+                            layer.msg(e.msg);
+                            if (e.code == 0) {
+                                setTimeout(function () {
+                                    location.reload();
+                                }, 1000);
+                            }
+                        });
+                        layer.close(index);
+                    },
+                    btn2: function (index, layero) {
+                        layer.close(index);
+                    }
+                });
+            } else if (obj.event === 'del') {
+                layer.confirm('确定要删除该选题吗?', {
+                    icon: 3,
+                    title: '提示'
+                }, function (index) {
+                    let callback = function (e) {
+                        layer.msg(e.msg);
+                        if (e.code == 0) {
+                            obj.del();
+                        }
+                    }
+                    tool.delete("/design/resubmit/del", {project_id: data.project_id}, callback);
+                    layer.close(index);
+                });
+            }
+            return false;
+        });
+
+
+        //监听搜索提交
+        form.on('submit(searchform)', function (data) {
+            layui.pageTable.reload({
+                where: {
+                    keywords: data.field.keywords,
+                    type_id: data.field.type_id
+                },
+                page: {
+                    curr: 1
+                }
+            });
+            return false;
+        });
+    }
+</script>
+{/block}
+<!-- /脚本 -->

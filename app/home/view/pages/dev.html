@@ -1,0 +1,218 @@
+{extend name="common/base"/}
+{block name="style"}
+<link rel="stylesheet" href="{__JS__}/aos/aos.css" />
+<link rel="stylesheet" href="https://www.gougucms.com/static/home/dev/dev.css" />
+{/block}
+{block name="title"}
+<title>{$detail.title}</title>
+{/block}
+{block name="keywords"}
+<meta name="keywords" content="{$detail.keyword_names}" />
+<meta name="description" content="{$detail.desc}" />
+{/block}
+<!-- 主体 -->
+{block name="body"}
+{include file="common/header" nav='index' /}
+	<section class="banner">
+		<div class="container">
+				<div class="banner-text">
+					<h1 data-aos="fade-up">项目研发管理工具</h1>
+					<h2 data-aos="fade-up" data-aos-delay="400">让项目管理变得简单，实现『研发+管理』全面提升</h2>
+					<div data-aos="fade-up" data-aos-delay="800">
+						<a href="https://gitee.com/gouguopen/dev" class="btn-down" target="_blank"><span>立即下载(Gitee)</span></a>
+						<a href="https://dev.gougucms.com/" class="btn-go" target="_blank"><span>体验演示</span></a>
+						<span class="btn-view">查看体验账号</span>
+					</div>
+					<div class="banner-ops" data-aos="fade-up" data-aos-delay="1000">
+						<a href="https://blog.gougucms.com/home/book/detail/bid/7.html" class="btn-full" target="_blank">文档说明</a>	
+						<span style="margin-right:20px;">业务咨询微信号：hdm588</span>						
+						<a href="https://gitee.com/gouguopen/dev/releases" target="_blank">更新日志</a>
+						<a href="https://www.bt.cn/?invite_code=MV9zbG93ank=" rel="nofollow" target="_blank">推荐使用宝塔面板部署</a>
+					</div>
+				</div>
+				<div class="banner-img" data-aos="zoom-out" data-aos-delay="300">
+					<img src="https://www.gougucms.com/static/home/dev/banner_bg.png" alt="">
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section class="advantage">
+        <div class="container" data-aos="fade-up">
+            <header class="section-header">
+                <h2>适合各行业软件开发团队</h2>
+                <p>在线管理团队的工作、项目和任务，覆盖从需求提出到研发完成上线的研发管理全生命周期</p>
+            </header>
+            <div class="item-wrap">
+                <div class="item-col-4">
+                    <div class="box" data-aos="fade-up" data-aos-delay="200">
+                        <img src="https://www.gougucms.com/static/home/dev/p1.png" class="img-fluid" alt="">
+                        <h3>协同</h3>
+                        <p>日程 / 日报 / 项目 / 任务</p>
+                    </div>
+                </div>
+                <div class="item-col-4">
+                    <div class="box" data-aos="fade-up" data-aos-delay="400">
+                        <img src="https://www.gougucms.com/static/home/dev/p2.png" class="img-fluid" alt="">
+                        <h3>项目</h3>
+                        <p>需求 / 设计 / 研发 / 测试 </p>
+                    </div>
+                </div>
+                <div class="item-col-4">
+                    <div class="box" data-aos="fade-up" data-aos-delay="600">
+                        <img src="https://www.gougucms.com/static/home/dev/p3.png" class="img-fluid" alt="">
+                        <h3>工时</h3>
+                        <p>进度 / 成本 / 绩效 / 质量</p>
+                    </div>
+                </div>
+                <div class="item-col-4">
+                    <div class="box" data-aos="fade-up" data-aos-delay="800">
+                        <img src="https://www.gougucms.com/static/home/dev/p4.png" class="img-fluid" alt="">
+                        <h3>知识库</h3>
+                        <p>文档 / 经验 / 规范 / 分享</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+	
+	<section class="step">
+        <div class="container" data-aos="fade-up">
+            <header class="section-header">
+                <h2>项目研发实施流程</h2>
+            </header>
+            <div class="item-wrap">
+                <div class="item-col-6">
+                    <div class="step-box">
+                        <i class="bi ri-todo-line"></i>
+                        <div>
+                            <span>10%</span>
+                            <p>需求分析</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="item-col-6">
+                    <div class="step-box">
+                        <i class="bi ri-draft-line" style="color: #ee6c20;"></i>
+                        <div>
+							<span style="color: #ee6c20;">25%</span>
+                            <p>产品策划</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="item-col-6">
+                    <div class="step-box">
+                        <i class="bi ri-pages-line" style="color: #52CD75;"></i>
+                        <div>
+                            <span style="color: #52CD75;">45%</span>
+                            <p>UI设计</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="item-col-6">
+                    <div class="step-box">
+                        <i class="bi ri-file-code-line" style="color: #EA4335;"></i>
+                        <div>
+                            <span style="color: #EA4335;">85%</span>
+                            <p>技术研发</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="item-col-6">
+                    <div class="step-box">
+                        <i class="bi ri-bug-line" style="color: #9B74D7;"></i>
+                        <div>
+                            <span style="color: #9B74D7;">95%</span>
+                            <p>测试运维</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="item-col-6">
+                    <div class="step-box">
+                        <i class="bi ri-git-repository-commits-line" style="color: #f51f9c;"></i>
+                        <div>
+                            <span style="color: #f51f9c;">100%</span>
+                            <p>成功上线</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>	
+	
+	<section class="services">
+		<div class="container" data-aos="fade-down">
+			<header class="section-header">
+				<h2>六大主要功能模块</h2>
+				<p>改进项目管理模式 提升团队的研发效率，低成本、全流程、快速定制，属于您团队的研发协同工具</p>
+			</header>
+			<div class="item-wrap">
+				<div class="item-col-3" data-aos="fade-up" data-aos-delay="200">
+					<div class="service-box blue">
+						<i class="bi ri-book-read-line"></i>
+						<h3>产品</h3>
+						<p>支持多产品路线，把控进度，协调团队资源</p>
+					</div>
+				</div>
+				<div class="item-col-3" data-aos="fade-up" data-aos-delay="300">
+					<div class="service-box orange">
+						<i class="bi ri-folders-line"></i>
+						<h3>项目</h3>
+						<p>项目操作记录全覆盖跟踪，项目进度一目了然</p>
+					</div>
+				</div>
+				<div class="item-col-3" data-aos="fade-up" data-aos-delay="400">
+					<div class="service-box green">
+						<i class="bi ri-file-list-line"></i>
+						<h3>任务</h3>
+						<p>时间跟踪机制，多状态流转，任务成果可见可控</p>
+					</div>
+				</div>
+				<div class="item-col-3" data-aos="fade-up" data-aos-delay="500">
+					<div class="service-box red">
+						<i class="bi ri-time-line"></i>
+						<h3>工时</h3>
+						<p>日报周报，工时登记，团队工作精细化管理</p>
+					</div>
+				</div>
+				<div class="item-col-3" data-aos="fade-up" data-aos-delay="600">
+					<div class="service-box purple">
+						<i class="bi ri-bug-2-line"></i>
+						<h3>测试</h3>
+						<p>编写测试用例库，BUG记录、跟踪和管理</p>
+					</div>
+				</div>
+				<div class="item-col-3" data-aos="fade-up" data-aos-delay="700">
+					<div class="service-box pink">
+						<i class="bi ri-newspaper-line"></i>
+						<h3>知识库</h3>
+						<p>技术文档、开发经验、规则规范、支持多人分享</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+{/block}
+{block name="script"}
+    <script src="{__JS__}/aos/aos.js"></script>
+	<script src="https://www.gougucms.com/static/home/js/layer/layer.js"></script> 
+    <script>
+      AOS.init({
+        easing: 'ease-in-out-sine'
+      });
+	  
+	  $('.btn-view').on('click',function(){
+		layer.open({
+			'title':'体验账号',
+			'content':'技术总监：gougujishu&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;123456<br> 工 程 师 ：ligong&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;123456<br>产品经理：ouyangchanpin&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;123456'
+		});
+	  })
+    </script>
+{/block}
+</body>
+</html>

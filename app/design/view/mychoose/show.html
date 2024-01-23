@@ -1,0 +1,91 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<form class="layui-form p-4">
+    <h3 class="pb-3">题目详细</h3>
+    <table class="layui-table layui-table-form">
+        <tr>
+            <td class="layui-td-gray">题目名<font></font></td>
+            <td>
+                <label class="" style="color: #23292e">{$data.project_name}</label>
+            </td>
+        </tr>
+        <tr>
+            <td class="layui-td-gray">题目分类<font></font></td>
+            <td>
+                <label class="" style="color: #23292e">{$type.type_name}</label>
+            </td>
+        </tr>
+        <tr>
+            <td class="layui-td-gray">指导老师<font></font></td>
+            <td>
+                <label class="" style="color: #23292e">{$teacher.nickname}</label>
+            </td>
+        </tr>
+        <tr>
+            <td class="layui-td-gray">选题情况<font></font></td>
+            <td>
+                {if $select.select_status == 2}
+                <label class="" style="color: green">已被选择</label>
+                {/if}
+                {if $select.select_status != 2}
+                <label class="" style="color: #23292e">未被选</label>
+                {/if}
+            </td>
+        </tr>
+        <tr>
+            <td class="layui-td-gray">审核状态<font></font></td>
+            <td>
+                {if $data.status == 1}
+                <label class="" style="color: #16b777">审核通过</label>
+                {/if}
+                {if $data.status == -1}
+                <label class="" style="color: #ff5722">已拒绝</label>
+                {/if}
+                {if $data.status == 0}
+                <label class="" style="color: #ffb800">未审核</label>
+                {/if}
+                <!--<input type="radio" name="status" value="1" title="审核通过" {eq name="$data.status" value="1"}checked{/eq}>
+                <input type="radio" name="status" value="0" title="未审核" {eq name="$data.status" value="0"}checked{/eq}>
+                <input type="radio" name="status" value="-1" title="已拒绝" {eq name="$data.status" value="-1"}checked{/eq}>
+            --></td>
+        </tr>
+        <tr>
+            <td class="layui-td-gray">题目要求<font></font></td>
+            <td>
+
+                <textarea name="desc" style="height: 405px;" placeholder="要求" class="layui-textarea">{$data.desc}</textarea>
+            </td>
+        </tr>
+    </table>
+    <div class="pt-3">
+        <input type="hidden" name="project_id" value="{$data.project_id}"/>
+        <!--<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="webform">立即提交</button>
+        <button type="reset" class="layui-btn layui-btn-primary">重置</button>-->
+    </div>
+</form>
+{/block}
+<!-- /主体 -->
+<!-- 脚本 -->
+{block name="script"}
+<script>
+    moduleInit = ['tool', 'tinymce'];
+    function gouguInit() {
+        var form = layui.form, tool = layui.tool;
+        //监听提交
+        form.on('submit(webform)', function (data) {
+            let callback = function (e) {
+                layer.msg(e.msg);
+                if (e.code == 0) {
+                    tool.tabRefresh(71);
+                    tool.sideClose(1000);
+                }
+            }
+            tool.post("/design/audit/show", data.field, callback);
+            return false;
+        });
+
+    }
+</script>
+{/block}
+<!-- /脚本 -->

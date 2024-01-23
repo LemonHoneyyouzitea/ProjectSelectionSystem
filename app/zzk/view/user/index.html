@@ -1,0 +1,90 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<div class="p-3">
+    <form class="layui-form gg-form-bar border-t border-x">
+        <div class="layui-input-inline" style="width: 320px;">
+            <input type="text" name="keywords" placeholder="登录账户/用户名/手机号码" class="layui-input" autocomplete="off"/>
+        </div>
+        <div class="layui-input-inline">
+            <button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="webform">提交搜索</button>
+        </div>
+    </form>
+    <table class="layui-hide" id="admin" lay-filter="admin"></table>
+</div>
+
+
+<script type="text/html" id="toolbarDemo">
+    <button class="layui-btn layui-btn-sm" id="add">+ 添加用户</button>
+    <!--<button type="button" id="upload" class="layui-btn layui-btn-sm" lay-options="{accept: 'file',exts: 'xls|xlsx'}">导入用户</button>
+    <a href="/static/导入模板.xlsx" class="layui-btn layui-btn-sm">下载模板</a>-->
+</script>
+
+
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+    const moduleInit = ['tool'];
+
+    function gouguInit() {
+        var upload = layui.upload;
+        var table = layui.table, tool = layui.tool, form = layui.form;
+        layui.pageTable = table.render({
+            elem: '#admin',
+            title: '管理员列表',
+            toolbar: '#toolbarDemo',
+            url: '/zzk/user/index', //数据接口
+            page: true, //开启分页
+            limit: 20,
+            cols: [[
+                {field: 'username', title: '登录账号'},
+                {field: 'nickname', title: '用户名'},
+                {field: 'groupName', title: '角色'},
+                {field: 'login_num', title: '累计登录', align: 'center'},
+                {field: 'last_login_time', title: '最后登录时间', align: 'center'},
+                {field: 'last_login_ip', title: '最后登录IP'}
+            ]]
+        });
+        //表头工具栏事件
+        $('#add').click(function () {
+            tool.side("/zzk/user/add_user");
+            return;
+        });
+        /*upload.render({
+            elem: '#upload', // 绑定元素
+            url: '/zzk/user/import_user', // 此处配置你自己的上传接口即可
+            accept: 'file', // 普通文件
+            done: function(res){
+                //如果上传失败
+                if (res.code == 1) {
+                    return layer.msg('导入失败');
+                }else{
+                    layer.msg(res.msg);
+                    setTimeout(function () {
+                        location.reload();
+                    }, 1000);
+
+                }
+
+            }
+        });*/
+
+        //监听搜索提交
+        form.on('submit(webform)', function (data) {
+            layui.pageTable.reload({
+                where: {
+                    keywords: data.field.keywords
+                },
+                page: {
+                    curr: 1
+                }
+            });
+            return false;
+        });
+    }
+</script>
+{/block}
+<!-- /脚本 -->

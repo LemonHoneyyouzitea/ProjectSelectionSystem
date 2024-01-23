@@ -1,0 +1,78 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<style>
+    h1 {
+        text-align: center;
+        margin-top: 50px;
+        margin-bottom: 10px;
+    }
+</style>
+<form class="layui-form p-4">
+    <input type="hidden" id="equipment_id" name="equipment_id" value="{$data.equipment_id}" />
+    <h1 class="layui-font-green">已被使用的设备</h1>
+    <div class="p-3">
+        <table class="layui-hide" type="hidden" id="department" lay-filter="department" ></table>
+    </div>
+</form>
+
+{/block}
+<!-- /主体 -->
+<!-- 脚本 -->
+{block name="script"}
+
+<script type="text/html" id="barDemo">
+    {{#  if(d.status ==1){ }}
+    <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="repair">维修</a>
+    {{#  }else{  }}
+    -
+    {{#  } }}
+</script>
+<script>
+    var moduleInit = ['tool'];
+    function gouguInit() {
+        var table = layui.table, tool = layui.tool, form = layui.form;
+        layui.pageTable = table.render({
+            elem: '#department',   //对应13行的id的值
+            title: '当前设备归属的部门列表',
+            toolbar: '#toolbarDemo',
+            page: false,
+            url: '/zzk/equipment/belong?equipment_id='+$("#equipment_id").val(), //数据接口
+            cols: [[
+                {type: 'numbers', title: '序号', align: 'center', width: 80},
+                {field: 'belong_id', title: 'belong_id', align: 'center',hide:'ture'},
+                {field: 'department_name', title: '部门名', align: 'center'},
+                {field: 'status', title: '状态', align: 'center', width: 60, templet: function (d) {
+                        if (d.status == 1) return '<span style="color: #00a8c6">使用中</span>';
+                        else return '<span style="color:#FF5722">故障</span>';
+                    }
+                },
+                {field: 'number', title: '数量', align: 'center'},
+                {fixed: 'right', field: 'right', title: '操作', toolbar: '#barDemo', align: 'center'}
+            ]]
+        });
+        //监听提交
+        form.on('submit(webform)', function (data) {
+            let callback = function (e) {
+                layer.msg(e.msg);
+                if (e.code == 0) {
+                    tool.tabRefresh(71);
+                    tool.sideClose(1000);
+                }
+            }
+            tool.post("/zzk/equipment/save", data.field, callback);
+            return false;
+        });
+        //监听表格行工具事件
+        table.on('tool(department)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'repair') {  //加入购物车
+                tool.side('/zzk/equipment/worker?id=' + data.belong_id);
+            }
+            return false;
+        });
+
+    }
+</script>
+{/block}
+<!-- /脚本 -->

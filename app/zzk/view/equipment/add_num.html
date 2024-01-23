@@ -1,0 +1,94 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<style>
+    h3 {
+        text-align: center;
+        margin-top: 50px;
+        margin-bottom: 10px;
+    }
+</style>
+<form class="layui-form p-4">
+    <h3 class="pb-3">增加设备数量</h3>
+    <input type="hidden" id="equipment_id" name="equipment_id" value="{$data.equipment_id}" />
+    <table class="layui-table layui-table-form">
+
+        <tr>
+        <td class="layui-td-gray">数量<font>*</font></td>
+        <td>
+            <input type="text" name="number" value="0" min="0" lay-verify="required|number" placeholder="请输入数量" lay-affix="number" step="1"  class="layui-input">
+            <input type="hidden" name="enable_number" value="0"   class="layui-input">
+        </td>
+    </tr>
+    </table>
+    <h3 class="pb-3">已被使用的设备</h3>
+    <div class="p-3">
+        <table class="layui-hide" type="hidden" id="department" lay-filter="department" ></table>
+    </div>
+    <h3 class="pb-3">还未被使用的设备</h3>
+    <div class="p-3">
+        <table class="layui-hide" type="hidden" id="enable" lay-filter="enable" ></table>
+    </div>
+    <div class="py-3">
+        <button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="webform">立即提交</button>
+        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+    </div>
+</form>
+{/block}
+<!-- /主体 -->
+<!-- 脚本 -->
+{block name="script"}
+<script>
+    var moduleInit = ['tool'];
+
+    function gouguInit() {
+        var table = layui.table, tool = layui.tool, form = layui.form;
+        layui.pageTable = table.render({
+            elem: '#department',   //对应13行的id的值
+            title: '当前设备归属的部门列表',
+            toolbar: '#toolbar',
+            page: false,
+            url: '/zzk/equipment/belong?equipment_id='+$("#equipment_id").val(), //数据接口
+            cols: [[
+                {type: 'numbers', title: '序号', align: 'center', width: 80},
+                {field: 'department_name', title: '部门名', align: 'center'},
+                {field: 'status', title: '状态', align: 'center', width: 60, templet: function (d) {
+                        if (d.status == 1) return '<span style="color: #00a8c6">使用中</span>';
+                        else return '<span style="color:#FF5722">故障</span>';
+                    }
+                },
+                /*{field: 'num', title: '数量'},*/
+                {field: 'number', title: '数量', align: 'center'},
+            ]]
+        });
+        var table2 = layui.table;
+        layui.pageTable = table2.render({
+            elem: '#enable',   //对应13行的id的值
+            title: '当前设备还未使用列表',
+            toolbar: '#toolbar',
+            page: false,
+            url: '/zzk/equipment/enable?equipment_id='+$("#equipment_id").val(), //数据接口
+            cols: [[
+                {type: 'numbers', title: '序号', align: 'center', width: 80},
+                {field: 'equipment_name', title: '设备名', align: 'center'},
+                {field: 'enable_number', title: '未使用数量', align: 'center'},
+                /*{field: 'num', title: '数量'},*/
+            ]]
+        });
+        //监听提交
+        form.on('submit(webform)', function (data) {
+            let callback = function (e) {
+                layer.msg(e.msg);
+                if (e.code == 0) {
+                    setTimeout(function () {
+                        parent.location.reload();
+                    }, 1000);
+                }
+            }
+            tool.post("/zzk/equipment/save_add", data.field, callback);
+            return false;
+        });
+    }
+</script>
+{/block}
+<!-- /脚本 -->

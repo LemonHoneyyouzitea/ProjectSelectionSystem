@@ -1,0 +1,50 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<form class="layui-form p-4">
+    <input type="text" name="order_no" value="{$data.order_no}" />
+    <div class="py-3">
+        <button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="webform">查看详细</button>
+    </div>
+    <div class="p-3">
+        <table class="layui-hide" type="hidden" id="book" lay-filter="book"></table>
+    </div>
+</form>
+
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+    var moduleInit = ['tool'];
+
+    function gouguInit() {
+        var table = layui.table, tool = layui.tool, form = layui.form;
+
+        //监听提交
+        form.on('submit(webform)', function (data) {
+            layui.pageTable = table.render({
+                elem: '#book',   //对应13行的id的值
+                title: '图书类别列表',
+                toolbar: '#toolbar',
+                page: false,
+                where: {
+                    order_no: data.field.order_no
+                },
+                url: '/teach/cart/read', //数据接口
+                cols: [[
+                    {type: 'numbers', title: '序号', align: 'center', width: 80},
+                    {field: 'data.order_no', title: '订单号'},
+                    {field: 'book_id', title: '书号'},
+                    /*{field: 'num', title: '数量'},*/
+                    {field: 'num', title: '数量', align: 'center'},
+                    {title: '操作', toolbar: '#bar', width: 100, align: 'center'}
+                ]]
+            });
+            return false;
+        });
+    }
+</script>
+{/block}
+<!-- /脚本 -->

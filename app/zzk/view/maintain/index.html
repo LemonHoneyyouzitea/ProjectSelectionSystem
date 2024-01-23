@@ -1,0 +1,75 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+
+<div class="p-3">
+    <table class="layui-hide" id="equipment" lay-filter="equipment"></table>
+</div>
+
+
+<script type="text/html" id="toolbarDemo">
+</script>
+
+<script type="text/html" id="bar">
+
+    {{#  if(d.status ==0){ }}
+    <a class="layui-btn layui-btn-xs" lay-event="fix">维修</a>
+    {{#  }else{  }}
+    -
+    {{#  } }}
+
+</script>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+    const moduleInit = ['tool'];
+
+    function gouguInit() {
+        var table = layui.table, tool = layui.tool, form = layui.form;
+        layui.pageTable = table.render({
+            elem: '#equipment',
+            title: '列表',
+            toolbar: '#toolbarDemo',
+            url: '/zzk/maintain/index',
+            page: true,
+            limits: [10, 20, 50, 100],
+            limit: 10,
+            cols: [[
+                {type: 'numbers', title: '编号', align: 'center', width: 80},
+                {field: 'repair_id', title: '维修id', align: 'center',hide:'ture'},
+                {field: 'equipment_name', title: '设备名', align: 'center',},
+                {field: 'order_no', title: '维修单号', align: 'center'},
+                {field: 'department_name', title: '所属部门', align: 'center',},
+                {field: 'nickname', title: '报修管理员', align: 'center',},
+                {field: 'order_date', title: '申请时间', align: 'center',},
+                {field: 'status', title: '状态', align: 'center', width: 60, templet: function (d) {
+                        if (d.status == 1) return '<span>已维修</span>';
+                        else return '<span style="color:#FF5722">待维修</span>';}},
+                {title: '操作', toolbar: '#bar', width: 100, align: 'center'},
+            ]]
+        });
+
+        table.on('tool(equipment)', function (obj) {  //对应13行的lay-filter的值
+
+            var data = obj.data;
+            if (obj.event === 'fix') {  //加入购物车
+                let callback = function (e) {
+                    layer.msg(e.msg);
+                    if (e.code == 0) {
+                        setTimeout(function () {
+                            table.reload('equipment');
+                        }, 1000);
+                    }
+                }
+                tool.post('/zzk/maintain/fix' ,{repair_id: data.repair_id} , callback);
+                return false;
+            }
+            return false;
+        });
+    }
+</script>
+{/block}
+<!-- /脚本 -->

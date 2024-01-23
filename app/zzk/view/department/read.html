@@ -1,0 +1,103 @@
+
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<style>
+    h1 {
+        text-align: center;
+        margin-top: 50px;
+        margin-bottom: 10px;
+    }
+</style>
+<form class="layui-form p-4">
+    <input type="hidden" id="department_id" name="department_id" value="{$department_id}" />
+    <h1 class="layui-font-green">设备列表</h1>
+    <div class="p-3">
+        <table class="layui-hide" type="hidden" id="equipment" lay-filter="equipment" ></table>
+    </div>
+    </div>
+    <h1 class="layui-font-green">医院可供使用的设备</h1>
+    <div class="p-3">
+        <table class="layui-hide" type="hidden" id="enable" lay-filter="enable" ></table>
+    </div>
+</form>
+<script type="text/html" id="bar">
+    <a class="layui-btn layui-btn-xs" lay-event="take">使用</a>
+</script>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+    var moduleInit = ['tool'];
+
+    function gouguInit() {
+
+        var table = layui.table, tool = layui.tool, form = layui.form;
+        layui.pageTable = table.render({
+            elem: '#equipment',   //对应13行的id的值
+            title: '当前部门下的设备列表',
+            toolbar: '#toolbarDemo',
+            url: '/zzk/department/read?department_id='+$("#department_id").val(), //数据接口
+            page: false,
+            cols: [[
+                {type: 'numbers', title: '序号', align: 'center', width: 80},
+                {field: 'equipment_name', title: '设备名', align: 'center'},
+                {field: 'create_time', title: '征用时间', align: 'center'},
+                {field: 'status', title: '状态', align: 'center', width: 60, templet: function (d) {
+            if (d.status == 1) return '<span>正常</span>';
+            else return '<span style="color:#FF5722">禁用</span>';
+                    }
+                },
+                /*{field: 'num', title: '数量'},*/
+                {field: 'number', title: '数量', align: 'center'},
+            ]]
+        });
+        var table2 = layui.table;
+        layui.pageTable = table2.render({
+            elem: '#enable',   //对应13行的id的值
+            title: '当前设备还未使用列表',
+            toolbar: '#toolbar',
+            url: '/zzk/department/enable?department_id='+$("#department_id").val(), //数据接口
+            page: false,
+            cols: [[
+                {type: 'numbers', title: '序号', align: 'center', width: 80},
+                {field: 'department_id', title: '部门号', align: 'center', hide:'ture'},
+                {field: 'equipment_name', title: '设备名', align: 'center'},
+                {field: 'enable_number', title: '未使用数量', align: 'center'},
+                {field: 'status', title: '状态', align: 'center', width: 60, templet: function (d) {
+                        if (d.status == 1) return '<span>正常</span>';
+                        else return '<span style="color:#FF5722">禁用</span>';
+                    }
+                },
+                {title: '操作', toolbar: '#bar', width: 100, align: 'center'},
+                /*{field: 'num', title: '数量'},*/
+            ]]
+        });
+        //监听提交
+        form.on('submit(webform)', function (data) {
+            return false;
+        });
+        table.on('tool(enable)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'take') {  //加入购物车
+                let callback = function (e) {
+                    layer.msg(e.msg);
+                    if (e.code == 0) {
+                        setTimeout(function () {
+                            parent.location.reload();
+                        }, 1000);
+                    }
+                }
+                //console.log(data)
+                tool.post('/zzk/department/take' ,data , callback);
+                return false;
+            }
+            return false;
+        });
+    }
+</script>
+{/block}
+<!-- /脚本 -->
+

@@ -1,0 +1,119 @@
+<div class="footer">
+	<div class="footer-top">
+		<div class="footer-top-box clearfix">
+			<div class="l footer-link">
+				<dl>
+					<dt class="dt-title"><a href="/">勾股CMS</a></dt>
+					<dd><a href="https://blog.gougucms.com/home/book/detail/bid/1.html">开发手册</a></dd>
+					<dd><a href="https://blog.gougucms.com/home/book/detail/bid/1/id/2.html">进阶指南</a></dd>
+					<dd><a href="/home/index/down.html">下载中心</a></dd>
+					<dd><a href="/admin">在线演示</a></dd>
+				</dl>
+			</div>
+			<div class="l footer-link">
+				<dl>
+					<dt class="dt-title"><a href="https://blog.gougucms.com/home/book/detail/bid/1/id/2.html">使用帮助</a></dt>
+					<dd><a href="https://blog.gougucms.com/">在线社区</a></dd>
+					<dd><a href="https://blog.gougucms.com/home/book/detail/bid/1.html">帮助中心</a></dd>
+					<dd><a href="https://blog.gougucms.com/home/book/detail/bid/1/id/3.html">常见问题</a></dd>
+					<dd><a href="https://gitee.com/gougucms/gougucms" target="_blank" rel="nofollow" class="site-fork">Gitee</a></dd>
+				</dl>
+			</div>
+			<div class="l footer-link">
+				<dl>
+					<dt class="dt-title"><a href="https://gitee.com/gougucms" target="_blank">勾股开源系列软件</a></dt>
+					<dd><a href="https://gitee.com/gougucms/office" target="_blank">勾股OA办公系统</a></dd>
+					<dd><a href="https://gitee.com/gougucms/blog" target="_blank">勾股BLOG博客系统</a></dd>
+					<dd><a href="https://gitee.com/gougucms/gougucms" target="_blank">勾股CMS内容管理系统</a></dd>
+					<dd><a href="https://gitee.com/gougucms/dev" target="_blank">勾股DEV项目管理系统</a></dd>					
+				</dl>
+			</div>
+			<div class="l footer-link">
+				<dl>
+					<dt class="dt-title"><a href="tencent://message/?uin=327725426&Site=SuperNic&Menu=yes">商务合作</a></dt>
+					<dd><a href="tencent://message/?uin=327725426&Site=SuperNic&Menu=yes">定制开发</a></dd>
+					<dd><a href="tencent://message/?uin=327725426&Site=SuperNic&Menu=yes">插件开发</a></dd>
+					<dd><a href="tencent://message/?uin=327725426&Site=SuperNic&Menu=yes">赞助投资</a></dd>
+					<dd><a href="tencent://message/?uin=327725426&Site=SuperNic&Menu=yes">广告投放</a></dd>
+				</dl>
+			</div>
+			<div class="r footer-about">
+				<dl>
+					<dt>联系方式</dt>
+					<dd>电子邮箱：hdm58@qq.com</dd>
+					<dd>微 信 号：hdm588</dd>
+					<dd>QQ交流群1：24641076(满)</dd>
+					<dd>QQ交流群2：46924914</dd>
+				</dl>
+			</div>
+		</div>
+	</div>
+	<div class="footer-bottom">
+		<div class="footer-bottom-box clearfix">
+			<div class="l">
+				{:get_system_config('web','copyright')}
+					<a target="_blank" rel="nofollow" style="margin-left: 15px;color:#dad8d5" href="http://www.beian.gov.cn/portal/registerSystemInfo">{:get_system_config('web','beian')}</a><a href="https://beian.miit.gov.cn/" target="_blank" rel="nofollow" style="margin-left: 15px;color:#dad8d5">{:get_system_config('web','icp')}</a>
+			</div>
+			<div class="r">
+				{:lang('welcome')}，{:lang('i18n')}
+			   <select id="language" class="lan">
+					<option value="zh-cn">中文简体</option>
+					<option value="zh-hk">中文繁体</option>
+					<option value="en-us">English</option>
+				</select>Powered by GouguCMS</div>
+		</div>
+	</div>
+</div>
+<script>
+	$("#language option[value=" + getCookie("think_lang") + "]").attr("selected", true);
+    //选择语言
+    $("#language").bind('change', function () {
+        var language = $(this).children('option:selected').val();
+        setCookie("think_lang", language, {
+            expires: 30,
+            path: ''
+        });
+        location.reload();
+    });
+    function setCookie(name, value, options) {
+        options = options || {};
+        if (value === null) {
+            value = '';
+            options.expires = -1;
+        }
+        var expires = '';
+        if (options.expires && (typeof options.expires == 'number' || options.expires.toUTCString)) {
+            var date;
+            if (typeof options.expires == 'number') {
+                date = new Date();
+                date.setTime(date.getTime() + (options.expires * 24 * 60 * 60 * 30));
+            } else {
+                date = options.expires;
+            }
+            expires = '; expires=' + date.toUTCString(); // use expires attribute, max-age is not supported by IE
+        }
+        var path = options.path ? '; path=' + options.path : '';
+        var domain = options.domain ? '; domain=' + options.domain : '';
+        var s = [cookie, expires, path, domain, secure].join('');
+        var secure = options.secure ? '; secure' : '';
+        var c = [name, '=', encodeURIComponent(value)].join('');
+        var cookie = [c, expires, path, domain, secure].join('')
+        document.cookie = cookie;
+    }
+
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    </script>

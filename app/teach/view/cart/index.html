@@ -1,0 +1,115 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+
+<div class="p-3">
+    <table class="layui-hide" id="book" lay-filter="book"></table>
+</div>
+
+
+<script type="text/html" id="toolbarDemo">
+    <button type="button" class="layui-btn layui-btn-sm layui-btn-normal" lay-event="commit">
+        <i class="layui-icon layui-icon-addition"></i> 提交订单
+    </button>
+    <a href="{:url('teach/user/index')}" class="layui-btn layui-btn-sm layui-btn-primary">
+        <i class="layui-icon layui-icon-user"></i> 用户管理
+    </a>
+</script>
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="inc"><i class="layui-icon layui-icon-addition"></i></a>
+    <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="desc"><i class="layui-icon layui-icon-subtraction"></i></a>
+</script>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+    const moduleInit = ['tool'];
+
+    function gouguInit() {
+        var table = layui.table, tool = layui.tool, form = layui.form;
+        layui.pageTable = table.render({
+            elem: '#book',
+            title: '列表',
+            toolbar: '#toolbarDemo',
+            url: '/teach/cart/index',
+            page: true,
+            limits: [10, 20, 50, 100],
+            limit: 10,
+            cols: [[
+                {type: 'checkbox'},
+                {type: 'numbers', title: '编号', align: 'center', width: 80},
+                {field: 'type_name', title: '图书类别', align: 'center',},
+                {field: 'book_name', title: '书名', align: 'center',},
+                {field: 'publisher', title: '出版社', align: 'center',},
+                {field: 'money', title: '价格', align: 'center',},
+                {field: 'num', title: '数量(单击数量可编辑)', align: 'center', edit: 'text'},
+                {title: '操作', templet: '#barDemo', align: 'center'}
+            ]]
+        });
+
+
+        table.on('edit(book)', function (obj) {
+            var value = obj.value // 得到修改后的值
+            var data = obj.data // 得到所在行所有键值
+
+            // 值的校验
+            if (value.replace(/\s/g, '') === '') {
+                layer.tips('值不能为空', this, {tips: 1});
+                return obj.reedit();
+            }
+
+            let callback = function (e) {
+                layer.msg(e.msg);
+            }
+            tool.post("/teach/cart/edit", {'cart_id': data.cart_id, 'num': value}, callback);
+        });
+
+
+        //监听表头工具栏事件
+        table.on('toolbar(book)', function (obj) {
+            if (obj.event === 'commit') {
+                var checkStatus = table.checkStatus('book');
+                var data = checkStatus.data;
+                if (data.length > 0) {
+                    var book_id = [];
+                    for (var i in data)
+                        book_id[i] = data[i].id;
+                    let callback = function (e) {
+                        layer.msg('购买成功！');
+                        setTimeout(function () {
+                            location.href = '/teach/cart/order';
+                        }, 1000);
+                    }
+                    tool.post("/teach/cart/buy", {id: book_id}, callback);
+                } else {
+                    layer.msg("请选择需要购买的图书！");
+                }
+            }
+        });
+
+        //监听表格行工具事件
+        table.on('tool(book)', function (obj) {
+            var data = obj.data;
+
+            if (obj.event === 'read') {
+                tool.side('/teach/cart/read?id=' + obj.data.id);
+            }else if (obj.event === 'inc') {
+                let callback = function (e) {
+                    layer.msg(e.msg);
+                    setTimeout(function () {
+                        location.href = '/teach/cart/index';
+                    }, 1000);
+                }
+                data.num+=1;
+                tool.post("/teach/cart/edit", {'cart_id': data.cart_id, 'num': data.num}, callback);
+            }
+            return false;
+        });
+
+
+    }
+</script>
+{/block}
+<!-- /脚本 -->

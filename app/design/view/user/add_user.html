@@ -1,0 +1,85 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<form class="layui-form p-4">
+    <div class="layui-form-bar">
+        <h3 class="pb-3">新增用户</h3>
+    </div>
+    <table class="layui-table layui-table-form">
+        <tr>
+            <td class="layui-td-gray">登录账号<font>*</font></td>
+            <td>
+                <input type="text" name="username" lay-verify="required" autocomplete="off" placeholder="请输入登录账号" lay-reqText="请输入登录账号" class="layui-input">
+            </td>
+            <td class="layui-td-gray">用户名<font>*</font></td>
+            <td>
+                <input type="text" name="nickname" lay-verify="required" placeholder="请输入用户名" lay-reqText="请输入用户名" autocomplete="off" class="layui-input">
+            </td>
+        </tr>
+        <tr>
+            <td class="layui-td-gray">登录密码<font>*</font></td>
+            <td>
+                <input type="password" name="pwd" lay-verify="required" placeholder="请输入密码" lay-reqText="请输入密码" autocomplete="off" class="layui-input">
+            </td>
+            <td class="layui-td-gray">确认密码<font>*</font></td>
+            <td>
+                <input type="password" name="pwd_confirm" lay-verify="required" placeholder="请再次输入密码" lay-reqText="请再次输入密码" autocomplete="off" class="layui-input">
+            </td>
+        </tr>
+        <tr>
+            <td class="layui-td-gray">手机号码<font>*</font></td>
+            <td>
+                <!--<input type="text" name="mobile"  placeholder="请输入手机"  autocomplete="off" class="layui-input">
+                --><input type="tel" name="mobile" placeholder="请输入手机" lay-verify="required|phone" autocomplete="off" lay-reqtext="请填写手机号" lay-affix="clear" class="layui-input demo-phone">
+            </td>
+
+            <td class="layui-td-gray">电子邮箱</td>
+            <td>
+                <input type="text" name="email"  placeholder="电子邮箱" autocomplete="off" class="layui-input">
+            </td>
+        </tr>
+        <tr>
+            <td class="layui-td-gray">学生学历<font>*</font></td>
+            <td>
+                <select name="education_id" lay-verify="required" lay-reqText="请选择学历">
+                    <option value="">请选择学生学历</option>
+                    {volist name="sp_education" id="v"}
+                    <option value="{$v.education_id}">{$v.education_name}</option>
+                    {/volist}
+                </select>
+            </td>
+        </tr>
+
+        <input type="hidden" name="group_id" value="9" lay-filter="demo-radio-filter" title="学生">
+
+    </table>
+    <div class="py-3">
+        <button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="webform">立即提交</button>
+        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+    </div>
+</form>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+    const moduleInit = ['tool'];
+    function gouguInit() {
+        var form = layui.form,tool=layui.tool,upload = layui.upload;
+        //监听提交
+        form.on('submit(webform)', function (data) {
+            let callback = function (e) {
+                layer.msg(e.msg);
+                if (e.code == 0) {
+                    parent.layui.tool.close(1000);
+                }
+            }
+            tool.post("/design/user/add_user", data.field, callback);
+            return false;
+        });
+    }
+
+</script>
+{/block}
+<!-- /脚本 -->
