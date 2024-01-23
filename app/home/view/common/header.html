@@ -1,0 +1,79 @@
+<header class="header">
+	<div class="nav-box">
+		<div class="l nav-logo">
+			<a href="/"><img src="{__IMG__}/logo.png" height="60" alt="勾股CMS" /></a>
+		</div>
+		<div class="r navbar">
+			<ul>
+			{foreach name="COMMON_NAV" item="a"}
+				{empty name="$a.list"}
+				<li {if condition="strpos($a.param,$params.action) nheq false"}class="active"{/if}>
+					<a href="{$a.src==''?'javascript:;':$a.src}" {eq name="a.target" value="1"} target="_blank"{/eq}>{$a.title}</a>
+				</li>
+				{else/}
+				<li class="dropdown">
+					<a href="{$a.src==''?'javascript:;':$a.src}" {eq name="a.target" value="1"} target="_blank"{/eq}>{$a.title}<i class="bi bi-chevron-down"></i></a>
+					<ul>
+						{foreach name="$a.list" item="b"}
+						<li {notempty name="$b.list"} class="dropdown" {/notempty}>
+							<a href="{$b.src==''?'javascript:;':$b.src}" {eq name="b.target" value="1"} target="_blank"{/eq}>{$b.title}{notempty name="$b.list"}<i class="bi bi-chevron-down"></i>{/notempty}</a>
+							{notempty name="$b.list"}
+							<ul>
+							{foreach name="$b.list" item="c"}
+								<li <li {notempty name="$c.list"} class="dropdown" {/notempty}>
+									<a href="{$b.src==''?'javascript:;':$b.src}" {eq name="b.target" value="1"} target="_blank"{/eq}>{$b.title}{notempty name="$c.list"}<i class="bi bi-chevron-down"></i>{/notempty}</a>
+									{notempty name="$c.list"}
+									<ul>
+										{foreach name="$c.list" item="d"}
+											<li><a href="{$d.src==''?'javascript:;':$d.src}" {eq name="d.target" value="1"} target="_blank"{/eq}>{$d.title}</a></li>
+										{/foreach}
+									</ul>
+									{/notempty}
+								</li>
+							{/foreach}
+							</ul>
+						{/notempty}
+						</li>
+					{/foreach}
+					</ul>
+				</li>	
+				{/empty}		
+			{/foreach}
+			    {empty name="$login_top"}
+				<li><a class="login-btn scrollto" href="/home/login/index">登录</a></li>
+				<li><a class="reg-btn scrollto" href="/home/login/reg">注册</a></li>
+				{else/}
+				<li class="nav-logined">
+					{:htmlspecialchars_decode($login_top)}
+					<div class="nav-login-box">
+						<div class="login-menu">
+							<a href="/home/user/index">个人中心</a>
+						</div>
+						<div class="login-menu-bottom clearfix">
+							<a class="l" href="/home/user/index">个人设置</a>
+							<a class="r" href="javascript:;" data-node="logout">退出</a>
+						</div>
+					</div>
+				</li>
+				{/empty}
+			</ul>
+		</div>
+	</div>
+	<script>
+		$('[data-node="logout"]').on("click", function () {
+			layer.confirm('确认注销登录吗?', { icon: 7, title: '警告' }, function (index) {
+				$.ajax({
+					url: '/home/login/login_out',
+					success: function (res) {
+						layer.msg(res.msg);
+						if (res.code == 0) {
+							setTimeout(function () {
+								location.href = "{:url('/')}"
+							}, 1000)
+						}
+					}
+				})
+			})
+		})
+	</script>
+</header>
